@@ -13,7 +13,11 @@ import '@fontsource/lexend/latin-ext-600.css';
 import '@fontsource/caveat/latin-700.css';
 import '@fontsource/caveat/latin-ext-700.css';
 import './styles.css';
+import { registerSW } from 'virtual:pwa-register';
 import { App } from './App';
+
+// Nová verze aplikace se po zveřejnění načte sama hned po otevření.
+registerSW({ immediate: true });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
