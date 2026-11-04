@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { quizById } from '../content';
 import { recordResult } from '../lib/progress';
+import { getMembership, leagueEnabled, pointsLabel, submitScore, type SubmitResult } from '../lib/league';
 import { gradeFor } from '../lib/grade';
 import type { Diagnosis, Item, Mode, Quiz } from '../lib/types';
 import { ChoiceAnswer, TilesAnswer, WriteAnswer } from '../components/Answers';
@@ -45,6 +46,7 @@ function Game({ quiz, mode }: { quiz: Quiz; mode: Mode }) {
   const [answer, setAnswer] = useState<{ res: Diagnosis; user: string | null } | null>(null);
   const [done, setDone] = useState(false);
   const [quitArmed, setQuitArmed] = useState(false);
+  const [league, setLeague] = useState<SubmitResult | 'sending' | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
 
   const item = round.items[idx];
@@ -69,6 +71,7 @@ function Game({ quiz, mode }: { quiz: Quiz; mode: Mode }) {
     setMissed([]);
     setAnswer(null);
     setDone(false);
+    setLeague(null);
   };
 
   const onAnswer = (res: Diagnosis, user: string | null) => {
@@ -86,6 +89,10 @@ function Game({ quiz, mode }: { quiz: Quiz; mode: Mode }) {
     const score = results.filter(Boolean).length;
     if (!round.retry) recordResult(quiz.id, mode.id, Math.round((score / total) * 100));
     setDone(true);
+    if (leagueEnabled && getMembership() && score > 0) {
+      setLeague('sending');
+      void submitScore(quiz.id, mode.id, score, total).then(setLeague);
+    }
   };
 
   if (done) {
@@ -110,6 +117,7 @@ function Game({ quiz, mode }: { quiz: Quiz; mode: Mode }) {
               <span key={i} className={`dot${r ? '' : ' bad'}`} />
             ))}
           </div>
+          <LeagueNote league={league} score={score} />
         </section>
 
         {missed.length > 0 && (
@@ -202,5 +210,34 @@ function Game({ quiz, mode }: { quiz: Quiz; mode: Mode }) {
         )}
       </article>
     </main>
+  );
+}
+
+function LeagueNote({ league, score }: { league: SubmitResult | 'sending' | null; score: number }) {
+  if (leagueEnabled && !getMembership())
+    return (
+      <p className="league-note">
+        Chceš soutěžit se spolužáky? <Link to="/trida">Připoj se ke třídě</Link>
+      </p>
+    );
+  if (!league) return null;
+  if (league === 'sending') return <p className="league-note">Posílám {pointsLabel(score)} do třídní soutěže…</p>;
+  if (league.status === 'sent')
+    return (
+      <p className="league-note ok" role="status">
+        +{pointsLabel(league.points)} pro třídní soutěž. Tento týden máš {pointsLabel(league.week)}.{' '}
+        <Link to="/trida">Žebříček</Link>
+      </p>
+    );
+  if (league.status === 'queued')
+    return (
+      <p className="league-note" role="status">
+        +{pointsLabel(league.points)}. {league.message}
+      </p>
+    );
+  return (
+    <p className="league-note" role="status">
+      {league.message}
+    </p>
   );
 }

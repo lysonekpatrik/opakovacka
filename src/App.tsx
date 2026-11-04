@@ -3,6 +3,7 @@ import { HashRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { QuizPage } from './pages/QuizPage';
 import { Play } from './pages/Play';
+import { ClassPage } from './pages/ClassPage';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -30,6 +31,7 @@ export function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/trida" element={<ClassPage />} />
         <Route path="/:subjectId/:quizId" element={<QuizPage />} />
         <Route path="/:subjectId/:quizId/:modeId" element={<Play />} />
         <Route path="*" element={<NotFound />} />

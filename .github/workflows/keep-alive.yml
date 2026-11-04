@@ -1,0 +1,23 @@
+# Bezplatná databáze Supabase se po 7 dnech bez používání uspí (třeba o prázdninách).
+# Tahle úloha se jí každé dva dny zeptá na žebříček, aby zůstala vzhůru.
+name: Udržet databázi vzhůru
+
+on:
+  schedule:
+    - cron: '17 6 */2 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Zeptat se databáze
+        run: |
+          curl --fail --silent --show-error -X POST \
+            "https://erposolgxjpttqvxahvz.supabase.co/rest/v1/rpc/leaderboard" \
+            -H "apikey: sb_publishable_qClCZd3P-yl5HEkVnsLbHA_uOdVk427" \
+            -H "Content-Type: application/json" \
+            -d '{"p_code":"KEEPALIVE"}'

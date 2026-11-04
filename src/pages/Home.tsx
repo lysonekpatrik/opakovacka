@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { activeSubjects, quizzesIn } from '../content';
 import { bestForQuiz } from '../lib/progress';
 import { InstallHint } from '../components/InstallHint';
+import { LeagueCard } from '../components/LeagueCard';
 
 /** 1 téma, 2–4 témata, 5 a víc témat */
 function topicsLabel(n: number) {
@@ -19,6 +20,8 @@ export function Home() {
         <h1 className="wordmark">Opakovačka</h1>
         <p className="lead">Procvičuj učivo na písemky. Po každé odpovědi se dozvíš, proč je to tak.</p>
       </header>
+
+      <LeagueCard />
 
       <div className="covers">
         {subjects.map((s) => {
@@ -60,7 +63,10 @@ export function Home() {
       <InstallHint />
 
       <footer className="foot">
-        <p>Opakovačka nesbírá žádné osobní údaje. Výsledky se ukládají jen v tomto zařízení.</p>
+        <p>
+          Opakovačka nesbírá žádné osobní údaje. Výsledky se ukládají jen v tomto zařízení. Do třídní soutěže se posílá
+          jen přezdívka a body.
+        </p>
         <p>Otázky jsou napsané podle učiva 4. ročníku základní školy.</p>
       </footer>
     </main>
