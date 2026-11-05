@@ -2,12 +2,13 @@ import type { Quiz, Subject, SubjectId } from '../lib/types';
 import { nezivaPriroda } from './prirodoveda/neziva-priroda';
 import { slovesoCan } from './anglictina/sloveso-can';
 import { beVePe } from './cestina/be-ve-pe';
+import { jihoceskyPlzenskyVysocina } from './vlastiveda/kraje';
 
 /**
  * Seznam všech kvízů.
  * Nový kvíz = nový soubor ve složce předmětu + jeden řádek sem.
  */
-export const QUIZZES: Quiz[] = [nezivaPriroda, slovesoCan, beVePe];
+export const QUIZZES: Quiz[] = [nezivaPriroda, slovesoCan, beVePe, jihoceskyPlzenskyVysocina];
 
 /** Předměty v pořadí, v jakém se zobrazí na úvodní obrazovce. */
 export const SUBJECTS: Subject[] = [

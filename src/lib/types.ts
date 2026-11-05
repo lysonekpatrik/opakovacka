@@ -6,7 +6,8 @@ export type Format = 'choice' | 'tiles' | 'write';
 export type IconName =
   | 'pen' | 'list' | 'blocks' | 'keyboard' | 'speaker' | 'mix' | 'sheet'
   | 'drop' | 'wind' | 'sun' | 'soil' | 'rock' | 'share' | 'back' | 'plus' | 'trophy'
-  | 'be' | 've' | 'pe';
+  | 'be' | 've' | 'pe'
+  | 'castle' | 'fish' | 'mountain' | 'pin' | 'city' | 'grape' | 'factory' | 'clock';
 
 /** Otázka s výběrem z možností. První možnost je vždy správná, při hře se zamíchají. */
 export interface ChoiceQuestion {
@@ -50,7 +51,32 @@ export interface TranslateQuestion {
   extraLabel?: string;
 }
 
-export type Question = ChoiceQuestion | TranslateQuestion;
+/**
+ * Krátká odpověď v češtině, kterou dítě napíše (krajské město, řeka…).
+ * Kontroluje se pravopis: háčky a čárky, překlepy, velká písmena.
+ */
+export interface WriteQuestion {
+  kind: 'write';
+  id: string;
+  prompt: string;
+  /** Uznávané odpovědi. První ukážeme jako správnou (u `pool` je to jen text k ukázání). */
+  answers: string[];
+  /**
+   * Když má dítě vyjmenovat víc věcí (v libovolném pořadí): seznam, ze kterého vybírá.
+   * Varianty jedné věci oddělené svislítkem: 'Německo|Německem'.
+   */
+  pool?: string[];
+  /** Kolik věcí z `pool` musí napsat. Výchozí: všechny. */
+  need?: number;
+  /** Velké písmeno je tu to hlavní (Kraj Vysočina), chyba v něm se počítá. */
+  strictCase?: boolean;
+  section?: string;
+  school?: boolean;
+  explain?: string;
+  explainLabel?: string;
+}
+
+export type Question = ChoiceQuestion | TranslateQuestion | WriteQuestion;
 
 export interface Item {
   q: Question;

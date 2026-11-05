@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { hintFor, judgeTranslation, normalize, tileWords } from '../lib/check';
+import { hintFor, judgeShort, judgeTranslation, normalize, tileWords, writeHint } from '../lib/check';
 import { shuffle } from '../lib/random';
-import type { Diagnosis, Item, Quiz, TranslateQuestion } from '../lib/types';
+import type { Diagnosis, Item, Quiz, TranslateQuestion, WriteQuestion } from '../lib/types';
 
 export interface AnswerProps {
   item: Item;
@@ -14,7 +14,7 @@ export interface AnswerProps {
 export function ChoiceAnswer({ item, quiz, onAnswer }: AnswerProps) {
   const q = item.q;
   const options = useMemo(() => {
-    const texts = q.kind === 'choice' ? q.options : [q.answers[0], ...q.wrongChoices];
+    const texts = q.kind === 'choice' ? q.options : q.kind === 'translate' ? [q.answers[0], ...q.wrongChoices] : q.answers;
     return shuffle(texts.map((t, k) => ({ t, correct: k === 0 })));
   }, [q]);
   const lang = q.kind === 'choice' ? q.optionsLang ?? 'cs' : quiz.targetLang ?? 'en';
@@ -187,6 +187,77 @@ export function WriteAnswer({ item, quiz, onAnswer }: AnswerProps) {
           {hintFor(q.answers[0])}
         </p>
       )}
+      {!done && (
+        <div className="row">
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => {
+              setHint(true);
+              input.current?.focus();
+            }}
+          >
+            Nápověda
+          </button>
+          <button type="submit" className="primary">
+            Zkontrolovat
+          </button>
+        </div>
+      )}
+    </form>
+  );
+}
+
+/* ---------- krátká odpověď v češtině ---------- */
+
+export function ShortAnswer({ item, onAnswer }: AnswerProps) {
+  const q = item.q as WriteQuestion;
+  const [value, setValue] = useState('');
+  const [hint, setHint] = useState(false);
+  const [done, setDone] = useState(false);
+  const [nudge, setNudge] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  const many = !!q.pool && (q.need ?? q.pool.length) > 1;
+
+  useEffect(() => {
+    input.current?.focus({ preventScroll: true });
+  }, []);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (done) return;
+    if (!value.trim()) {
+      setNudge(true);
+      input.current?.focus();
+      window.setTimeout(() => setNudge(false), 600);
+      return;
+    }
+    setDone(true);
+    onAnswer(judgeShort(value, q), value.trim());
+  };
+
+  return (
+    <form className="write" noValidate autoComplete="off" onSubmit={submit}>
+      <label className="sr" htmlFor="answer-input">
+        Tvoje odpověď
+      </label>
+      <input
+        id="answer-input"
+        ref={input}
+        className={nudge ? 'nudge' : undefined}
+        type="text"
+        lang="cs"
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="sentences"
+        spellCheck={false}
+        enterKeyHint="done"
+        placeholder={many ? 'Napiš je, odděl čárkou' : 'Napiš odpověď'}
+        value={value}
+        readOnly={done}
+        onChange={(e) => setValue(e.target.value)}
+      />
+      {hint && <p className="hint">{writeHint(q)}</p>}
       {!done && (
         <div className="row">
           <button

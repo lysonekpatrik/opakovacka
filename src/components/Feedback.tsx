@@ -23,8 +23,8 @@ export function Feedback({ item, quiz, res, user, last, onNext }: Props) {
   }, []);
 
   const correct = q.kind === 'choice' ? q.options[0] : q.answers[0];
-  const correctLang = q.kind === 'choice' ? q.optionsLang ?? 'cs' : quiz.targetLang ?? 'en';
-  const spoken = q.kind === 'translate' ? q.answers[0] : q.promptLang === 'en' ? q.prompt : null;
+  const correctLang = q.kind === 'choice' ? q.optionsLang ?? 'cs' : q.kind === 'write' ? 'cs' : quiz.targetLang ?? 'en';
+  const spoken = q.kind === 'translate' ? q.answers[0] : q.kind === 'choice' && q.promptLang === 'en' ? q.prompt : null;
   const verdict = res.ok ? 'Správně!' : res.almost ? 'Skoro!' : 'Tentokrát ne.';
   const verdictCls = res.ok ? 'ok' : res.almost ? 'almost' : 'bad';
 
@@ -43,7 +43,7 @@ export function Feedback({ item, quiz, res, user, last, onNext }: Props) {
       {!res.ok && user && item.format !== 'choice' && (
         <p className="answerline yours">
           <span className="answerline-label">Tvoje odpověď</span>
-          <span className="answerline-value" lang="en">
+          <span className="answerline-value" lang={q.kind === 'write' ? 'cs' : 'en'}>
             {user}
           </span>
         </p>
@@ -67,7 +67,7 @@ export function Feedback({ item, quiz, res, user, last, onNext }: Props) {
         </div>
       )}
 
-      {q.kind === 'choice' && q.explain && (
+      {q.kind !== 'translate' && q.explain && (
         <div className="note did-you-know">
           <span className="note-label">{q.explainLabel ?? 'Víš, že…?'}</span>
           <p>{q.explain}</p>

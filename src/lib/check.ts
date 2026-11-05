@@ -1,4 +1,4 @@
-import type { Diagnosis, TranslateQuestion } from './types';
+import type { Diagnosis, TranslateQuestion, WriteQuestion } from './types';
 
 export type Diagnose = (user: string, expected: string, q: TranslateQuestion) => string | null;
 
@@ -133,4 +133,160 @@ export function hintFor(sentence: string): string {
 /** Slova pro skládání (bez interpunkce). */
 export function tileWords(sentence: string): string[] {
   return sentence.replace(/[.,!?]/g, '').split(/\s+/).filter(Boolean);
+}
+
+/* ---------- krátké odpovědi v češtině ---------- */
+
+/** Slova, která dítě může napsat před odpověď: „řeka Vltava“, „v Písku“, „s Německem“. */
+const LEAD = /^(?:řeka|řeky|město|hora|hrad|zámek|zřícenina|jezero|rybník|v|ve|na|s|se)\s+/i;
+
+/** Sjednotí zápis české odpovědi: uvozovky, pomlčky, mezery, tečka na konci. */
+export function tidy(s: string): string {
+  return s
+    .replace(/[„“”"']/g, '')
+    .replace(/\s*[–—-]\s*/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\s*[.!?]+$/, '');
+}
+
+/** Bez háčků a čárek, malými písmeny. */
+export const plain = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+/** Jak moc se odpověď shoduje: přesně, jen jiná velká písmena, chybí háčky, překlep. */
+type Match = 'exact' | 'case' | 'accent' | 'typo';
+const RANK: Record<Match, number> = { exact: 0, case: 1, accent: 2, typo: 3 };
+
+interface Hit {
+  m: Match;
+  /** Odpověď dítěte (bez úvodního slova), se kterou se to shodlo. */
+  user: string;
+  /** Správný tvar, se kterým se to shodlo. */
+  expected: string;
+}
+
+function matchOne(user: string, expected: string): Hit | null {
+  let best: Hit | null = null;
+  for (const u of new Set([user, user.replace(LEAD, '')])) {
+    let m: Match | null = null;
+    if (u === expected) m = 'exact';
+    else if (u.toLowerCase() === expected.toLowerCase()) m = 'case';
+    else if (plain(u) === plain(expected)) m = 'accent';
+    else {
+      const e = plain(expected);
+      if (e.length >= 5 && distance(plain(u), e) <= (e.length >= 10 ? 2 : 1)) m = 'typo';
+    }
+    if (m && (!best || RANK[m] < RANK[best.m])) best = { m, user: u, expected };
+  }
+  return best;
+}
+
+function matchAny(user: string, variants: string[]): Hit | null {
+  let best: Hit | null = null;
+  for (const v of variants) {
+    const h = matchOne(user, tidy(v));
+    if (h && (!best || RANK[h.m] < RANK[best.m])) best = h;
+  }
+  return best;
+}
+
+/** Napsalo dítě malé písmeno tam, kde má být velké? */
+function lostCapital(h: Hit): boolean {
+  if (h.m !== 'case') return false;
+  for (let i = 0; i < h.expected.length; i++) {
+    const c = h.expected[i];
+    if (c !== c.toLowerCase() && h.user[i] === c.toLowerCase()) return true;
+  }
+  return false;
+}
+
+const CAPITAL_TIP = (w: string) => `Pozor na velké písmeno, správně se píše ${w}.`;
+const ACCENT_TIP = (w: string) => `Chybí háčky nebo čárky, správně se píše ${w}.`;
+const TYPO_TIP = (w: string) => `Pozor na pravopis, správně se píše ${w}.`;
+
+/** Rozdělí výčet „Mže a Radbuza“, „Vltava, Otava“ na jednotlivé položky. */
+const splitList = (s: string) => s.split(/\s*[,;+&/]\s*|\s+(?:a|i|nebo|a také)\s+/i).map(tidy).filter(Boolean);
+
+/** Vyhodnotí krátkou odpověď v češtině. */
+export function judgeShort(raw: string, q: WriteQuestion): Diagnosis {
+  const user = tidy(raw);
+  if (q.pool) return judgeList(user, q, q.pool);
+
+  const hit = matchAny(user, q.answers);
+  if (!hit) return { ok: false };
+  const shown = q.answers.find((a) => tidy(a) === hit.expected) ?? q.answers[0];
+  if (hit.m === 'exact') return { ok: true };
+  if (hit.m === 'case') {
+    if (!lostCapital(hit)) return { ok: true };
+    return q.strictCase ? { ok: false, almost: true, tip: CAPITAL_TIP(shown) } : { ok: true, note: CAPITAL_TIP(shown) };
+  }
+  if (hit.m === 'accent') return { ok: false, almost: true, tip: ACCENT_TIP(shown) };
+  return { ok: false, almost: true, tip: TYPO_TIP(shown) };
+}
+
+function judgeList(user: string, q: WriteQuestion, pool: string[]): Diagnosis {
+  const need = Math.min(q.need ?? pool.length, pool.length);
+  const entries = pool.map((p) => p.split('|'));
+  const found = new Map<number, Hit>();
+  const wrong: string[] = [];
+
+  const place = (part: string): boolean => {
+    let i = -1;
+    let h: Hit | null = null;
+    for (let k = 0; k < entries.length; k++) {
+      const hk = matchAny(part, entries[k]);
+      if (hk && (!h || RANK[hk.m] < RANK[h.m])) {
+        h = hk;
+        i = k;
+      }
+    }
+    if (!h) return false;
+    const prev = found.get(i);
+    if (!prev || RANK[h.m] < RANK[prev.m]) found.set(i, h);
+    return true;
+  };
+
+  for (const part of splitList(user)) {
+    if (place(part)) continue;
+    // „Mže Radbuza“ bez čárky: zkusíme jednotlivá slova
+    const words = part.split(' ');
+    if (words.length > 1 && words.every((w) => entries.some((v) => matchAny(w, v)))) words.forEach(place);
+    else wrong.push(part);
+  }
+
+  const hits = [...found.values()];
+  const good = hits.filter((h) => h.m === 'exact' || h.m === 'case');
+  const rough = hits.filter((h) => h.m === 'accent' || h.m === 'typo');
+  const canon = (h: Hit) => entries.find((v) => v.some((x) => tidy(x) === h.expected))?.[0] ?? h.expected;
+
+  if (!hits.length) return { ok: false };
+  if (wrong.length) {
+    const tip = `${wrong.join(', ')} sem nepatří.`;
+    return { ok: false, almost: good.length >= need, tip };
+  }
+  if (good.length >= need) {
+    const caps = good.filter(lostCapital).map(canon);
+    return { ok: true, note: caps.length ? `Pozor na velká písmena: ${caps.join(', ')}.` : null };
+  }
+  if (good.length + rough.length >= need)
+    return { ok: false, almost: true, tip: `Pozor na pravopis, správně se píše ${rough.map(canon).join(', ')}.` };
+  return { ok: false, tip: `Správně máš ${hits.length} z ${need}. Zkus si vzpomenout i na ostatní.` };
+}
+
+/** Nápověda v češtině: první písmeno každého slova, zbytek podtržítka. */
+export function czHint(text: string): string {
+  return text
+    .split(' ')
+    .map((w) => w.charAt(0) + w.slice(1).replace(/\p{L}/gu, '_'))
+    .join('  ');
+}
+
+/** Nápověda k otázce s psanou odpovědí. */
+export function writeHint(q: WriteQuestion): string {
+  if (!q.pool) return czHint(q.answers[0]);
+  const need = Math.min(q.need ?? q.pool.length, q.pool.length);
+  return q.pool
+    .slice(0, need)
+    .map((p) => czHint(p.split('|')[0]))
+    .join(',   ');
 }

@@ -18,6 +18,7 @@ Rodič pošle fotky z učebnice, sešitu nebo pracovního listu a řekne předm�
 2. **Vyber vzor:**
    - otázky s výběrem z možností → `src/content/prirodoveda/neziva-priroda.ts`
    - překlad vět (cizí jazyk) → `src/content/anglictina/sloveso-can.ts`
+   - psané odpovědi v češtině (krajské město, řeka, výčet v libovolném pořadí) → `src/content/vlastiveda/kraje-data.ts`, otázky typu `write`
 3. **Vytvoř soubor** `src/content/<předmět>/<téma>.ts`, export typu `Quiz` (`src/lib/types.ts`).
    - `id`: krátký slug bez diakritiky (`kraje-cr`), musí být jedinečné
    - `subject`: jedno z `cestina | matematika | anglictina | prirodoveda | vlastiveda`

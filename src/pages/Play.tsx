@@ -5,7 +5,7 @@ import { recordResult } from '../lib/progress';
 import { getMembership, leagueEnabled, pointsLabel, submitScore, type SubmitResult } from '../lib/league';
 import { gradeFor } from '../lib/grade';
 import type { Diagnosis, Item, Mode, Quiz } from '../lib/types';
-import { ChoiceAnswer, TilesAnswer, WriteAnswer } from '../components/Answers';
+import { ChoiceAnswer, ShortAnswer, TilesAnswer, WriteAnswer } from '../components/Answers';
 import { Feedback } from '../components/Feedback';
 import { SpeakButton } from '../components/SpeakButton';
 import { NotFoundQuiz } from '../components/NotFoundQuiz';
@@ -22,7 +22,7 @@ const LANG_NAME = { en: 'angličtiny', cs: 'češtiny' } as const;
 
 function pillFor(item: Item, quiz: Quiz): string {
   const q = item.q;
-  if (q.kind === 'choice' && q.section) return quiz.sections?.find((s) => s.id === q.section)?.name ?? quiz.title;
+  if (q.kind !== 'translate' && q.section) return quiz.sections?.find((s) => s.id === q.section)?.name ?? quiz.title;
   const answer = q.kind === 'translate' && q.context;
   if (item.format === 'choice') {
     if (q.kind === 'choice') return q.promptLang === 'en' ? 'Co ta věta znamená?' : 'Vyber správnou odpověď';
@@ -161,7 +161,8 @@ function Game({ quiz, mode }: { quiz: Quiz; mode: Mode }) {
 
   const q = item.q;
   const promptLang = q.kind === 'choice' ? q.promptLang ?? 'cs' : 'cs';
-  const AnswerView = item.format === 'choice' ? ChoiceAnswer : item.format === 'tiles' ? TilesAnswer : WriteAnswer;
+  const AnswerView =
+    q.kind === 'write' ? ShortAnswer : item.format === 'choice' ? ChoiceAnswer : item.format === 'tiles' ? TilesAnswer : WriteAnswer;
   const key = `${round.n}-${idx}`;
 
   return (
@@ -186,7 +187,7 @@ function Game({ quiz, mode }: { quiz: Quiz; mode: Mode }) {
       </div>
 
       <article className="qcard">
-        {q.kind === 'choice' && q.school && <span className="school">Ze školy</span>}
+        {q.kind !== 'translate' && q.school && <span className="school">Ze školy</span>}
         {q.kind === 'translate' && q.context && (
           <p className="ask">
             <span className="ask-label">Otázka</span>

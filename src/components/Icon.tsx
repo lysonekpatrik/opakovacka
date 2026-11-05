@@ -24,6 +24,14 @@ const PATHS: Record<IconName, string> = {
   be: syllable('bě'),
   ve: syllable('vě'),
   pe: syllable('pě'),
+  castle: '<path d="M4 21V9h3v2h2V9h2v2h2V9h2v2h2V9h3v12z"/><path d="M10 21v-4a2 2 0 0 1 4 0v4"/><path d="M12 9V3l3 1.5-3 1.5"/>',
+  fish: '<path d="M3 12c3-4.5 9-6 14-2 1 .8 2 1.4 4 2-2 .6-3 1.2-4 2-5 4-11 2.5-14-2z"/><path d="M3 12l-1-3M3 12l-1 3"/><path d="M8 11.5h.01"/>',
+  mountain: '<path d="M2 20l7-12 4 6 2.5-3.5L22 20z"/><path d="M7.2 11l1.8 1.5 1.6-1.2"/>',
+  pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
+  city: '<path d="M3 21h18"/><path d="M5 21V10l4-3v14"/><path d="M9 21V4h7v17"/><path d="M16 21v-8h4v8"/><path d="M12 8h1M12 11h1M12 14h1"/>',
+  grape: '<circle cx="9" cy="10" r="2.2"/><circle cx="14" cy="10" r="2.2"/><circle cx="11.5" cy="14" r="2.2"/><circle cx="6.8" cy="13.8" r="2.2"/><circle cx="16.2" cy="13.8" r="2.2"/><circle cx="11.5" cy="18" r="2.2"/><path d="M11.5 7.8V3l3 1"/>',
+  factory: '<path d="M3 21V11l5 3v-3l5 3v-3l5 3V4h3v17z"/><path d="M7 18h2M12 18h2"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/>',
 };
 
 export function Icon({ name, size = 24 }: { name: IconName; size?: number }) {
