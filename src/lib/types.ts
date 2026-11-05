@@ -5,7 +5,8 @@ export type Format = 'choice' | 'tiles' | 'write';
 
 export type IconName =
   | 'pen' | 'list' | 'blocks' | 'keyboard' | 'speaker' | 'mix' | 'sheet'
-  | 'drop' | 'wind' | 'sun' | 'soil' | 'rock' | 'share' | 'back' | 'plus' | 'trophy';
+  | 'drop' | 'wind' | 'sun' | 'soil' | 'rock' | 'share' | 'back' | 'plus' | 'trophy'
+  | 'be' | 've' | 'pe';
 
 /** Otázka s výběrem z možností. První možnost je vždy správná, při hře se zamíchají. */
 export interface ChoiceQuestion {

@@ -1,5 +1,9 @@
 import type { IconName } from '../lib/types';
 
+/** Ikona se slabikou (např. bě), pro kvízy z češtiny. */
+const syllable = (text: string) =>
+  `<text x="12" y="16.8" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" stroke="none">${text}</text>`;
+
 const PATHS: Record<IconName, string> = {
   pen: '<path d="M4 20l4.2-1 10.6-10.6a2.1 2.1 0 0 0-3-3L5.2 16 4 20z"/><path d="M14.5 6.5l3 3"/>',
   list: '<path d="M4 7l1.5 1.5L8 6"/><path d="M4 16l1.5 1.5L8 15"/><path d="M11.5 7.5H20M11.5 16.5H20"/>',
@@ -17,6 +21,9 @@ const PATHS: Record<IconName, string> = {
   back: '<path d="M15 5l-7 7 7 7"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7M10 17h4"/>',
+  be: syllable('bě'),
+  ve: syllable('vě'),
+  pe: syllable('pě'),
 };
 
 export function Icon({ name, size = 24 }: { name: IconName; size?: number }) {
