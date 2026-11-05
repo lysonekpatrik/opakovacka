@@ -260,6 +260,10 @@ mark { background: linear-gradient(transparent 52%, var(--marker) 52%, var(--mar
 .vocab div { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px dotted var(--rule); min-width: 0; }
 .vocab dt { font-weight: 600; }
 .vocab dd { margin: 0; color: var(--muted); text-align: right; }
+/* delší popisy: název nahoře, text pod ním */
+.vocab.stack { grid-template-columns: 1fr; }
+.vocab.stack div { flex-direction: column; gap: 2px; padding: 10px 0; }
+.vocab.stack dd { text-align: left; color: var(--ink); }
 
 /* ---------- hra ---------- */
 

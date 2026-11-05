@@ -31,7 +31,7 @@ export function Cheatsheet({ blocks }: { blocks: CheatBlock[] }) {
         return (
           <details key={i} className="cheat">
             <summary>{b.title}</summary>
-            <dl className="vocab">
+            <dl className={b.stack ? 'vocab stack' : 'vocab'}>
               {b.pairs.map(([a, c]) => (
                 <div key={a}>
                   <dt lang={b.lang}>{a}</dt>

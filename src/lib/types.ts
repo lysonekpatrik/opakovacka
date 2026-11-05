@@ -95,7 +95,7 @@ export interface Mode {
 export type CheatBlock =
   | { type: 'note'; title: string; text: string }
   | { type: 'rules'; title: string; rules: { label: string; example: string; translation: string; tip: string }[] }
-  | { type: 'vocab'; title: string; lang: Lang; pairs: [string, string][] };
+  | { type: 'vocab'; title: string; lang: Lang; pairs: [string, string][]; /** Delší popisy pod sebou. */ stack?: boolean };
 
 export interface Diagnosis {
   ok: boolean;
