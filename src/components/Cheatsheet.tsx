@@ -1,4 +1,5 @@
 import type { CheatBlock } from '../lib/types';
+import { CzMap } from './CzMap';
 
 /** Tahák k tématu: pravidla, slovíčka nebo poznámka „Zapamatuj si“. */
 export function Cheatsheet({ blocks }: { blocks: CheatBlock[] }) {
@@ -26,6 +27,22 @@ export function Cheatsheet({ blocks }: { blocks: CheatBlock[] }) {
                   </div>
                 ))}
               </div>
+            </details>
+          );
+        if (b.type === 'map')
+          return (
+            <details key={i} className="cheat" open>
+              <summary>{b.title}</summary>
+              <CzMap
+                label="Mapa České republiky s očíslovanými kraji"
+                numbers={Object.fromEntries(b.items.map(([id], n) => [id, n + 1]))}
+              />
+              <ol className="map-legend">
+                {b.items.map(([id, text]) => (
+                  <li key={id}>{text}</li>
+                ))}
+              </ol>
+              <p className="map-credit">Podklad mapy: © ČÚZK, licence CC BY 4.0</p>
             </details>
           );
         return (

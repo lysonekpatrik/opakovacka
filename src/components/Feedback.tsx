@@ -23,7 +23,7 @@ export function Feedback({ item, quiz, res, user, last, onNext }: Props) {
   }, []);
 
   const correct = q.kind === 'choice' ? q.options[0] : q.answers[0];
-  const correctLang = q.kind === 'choice' ? q.optionsLang ?? 'cs' : q.kind === 'write' ? 'cs' : quiz.targetLang ?? 'en';
+  const correctLang = q.kind === 'choice' ? q.optionsLang ?? 'cs' : q.kind === 'translate' ? quiz.targetLang ?? 'en' : 'cs';
   const spoken = q.kind === 'translate' ? q.answers[0] : q.kind === 'choice' && q.promptLang === 'en' ? q.prompt : null;
   const verdict = res.ok ? 'Správně!' : res.almost ? 'Skoro!' : 'Tentokrát ne.';
   const verdictCls = res.ok ? 'ok' : res.almost ? 'almost' : 'bad';
@@ -32,7 +32,7 @@ export function Feedback({ item, quiz, res, user, last, onNext }: Props) {
     <div className="feedback" ref={boxRef} aria-live="polite">
       <p className={`verdict ${verdictCls}`}>{verdict}</p>
 
-      {!res.ok && (
+      {!res.ok && q.kind !== 'find' && (
         <p className="answerline">
           <span className="answerline-label">Správně je</span>
           <span className="answerline-value" lang={correctLang}>

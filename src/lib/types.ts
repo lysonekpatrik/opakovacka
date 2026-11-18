@@ -70,13 +70,32 @@ export interface WriteQuestion {
   need?: number;
   /** Velké písmeno je tu to hlavní (Kraj Vysočina), chyba v něm se počítá. */
   strictCase?: boolean;
+  /** Slepá mapa: nad odpovědí se ukáže mapa ČR s vybarveným krajem (id kraje). */
+  map?: string;
   section?: string;
   school?: boolean;
   explain?: string;
   explainLabel?: string;
 }
 
-export type Question = ChoiceQuestion | TranslateQuestion | WriteQuestion;
+/** Slepá mapa: dítě klikne na mapě ČR na kraj, který je v zadání. */
+export interface FindQuestion {
+  kind: 'find';
+  id: string;
+  prompt: string;
+  /** Id kraje, na který má kliknout. */
+  region: string;
+  /** Název kraje, ukáže se v přehledu chyb. */
+  answers: string[];
+  /** Kde na mapě hledat (nápověda). */
+  hint?: string;
+  section?: string;
+  school?: boolean;
+  explain?: string;
+  explainLabel?: string;
+}
+
+export type Question = ChoiceQuestion | TranslateQuestion | WriteQuestion | FindQuestion;
 
 export interface Item {
   q: Question;
@@ -95,7 +114,9 @@ export interface Mode {
 export type CheatBlock =
   | { type: 'note'; title: string; text: string }
   | { type: 'rules'; title: string; rules: { label: string; example: string; translation: string; tip: string }[] }
-  | { type: 'vocab'; title: string; lang: Lang; pairs: [string, string][]; /** Delší popisy pod sebou. */ stack?: boolean };
+  | { type: 'vocab'; title: string; lang: Lang; pairs: [string, string][]; /** Delší popisy pod sebou. */ stack?: boolean }
+  /** Mapa ČR s očíslovanými kraji a legendou: [id kraje, popisek]. */
+  | { type: 'map'; title: string; items: [string, string][] };
 
 export interface Diagnosis {
   ok: boolean;

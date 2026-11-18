@@ -19,6 +19,7 @@ Rodič pošle fotky z učebnice, sešitu nebo pracovního listu a řekne předm�
    - otázky s výběrem z možností → `src/content/prirodoveda/neziva-priroda.ts`
    - překlad vět (cizí jazyk) → `src/content/anglictina/sloveso-can.ts`
    - psané odpovědi v češtině (krajské město, řeka, výčet v libovolném pořadí) → `src/content/vlastiveda/kraje-data.ts`, otázky typu `write`
+   - slepá mapa ČR (klikni na kraj / napiš vybarvený kraj) → `src/content/vlastiveda/slepa-mapa.ts`, otázky typu `find` a `write` s polem `map`; mapa krajů je v `mapa-kraju.ts` (data ČÚZK, CC BY 4.0, uvést zdroj)
 3. **Vytvoř soubor** `src/content/<předmět>/<téma>.ts`, export typu `Quiz` (`src/lib/types.ts`).
    - `id`: krátký slug bez diakritiky (`kraje-cr`), musí být jedinečné
    - `subject`: jedno z `cestina | matematika | anglictina | prirodoveda | vlastiveda`

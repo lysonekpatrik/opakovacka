@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { QUIZZES, SUBJECTS } from '.';
 import { judgeShort } from '../lib/check';
+import { MAP_REGIONS } from './vlastiveda/mapa-kraju';
 
 // Hlídá, aby nový kvíz neobsahoval chyby v datech.
 describe('obsah všech kvízů', () => {
@@ -15,7 +16,7 @@ describe('obsah všech kvízů', () => {
       });
       it('každá otázka má aspoň dvě různé možnosti', () => {
         for (const q of quiz.questions) {
-          if (q.kind === 'write') continue;
+          if (q.kind === 'write' || q.kind === 'find') continue;
           const opts = q.kind === 'choice' ? q.options : [q.answers[0], ...q.wrongChoices];
           expect(opts.length, q.id).toBeGreaterThanOrEqual(2);
           expect(new Set(opts).size, q.id).toBe(opts.length);
@@ -35,6 +36,12 @@ describe('obsah všech kvízů', () => {
           } else {
             for (const a of q.answers) expect(judgeShort(a, q).ok, `${q.id}: ${a}`).toBe(true);
           }
+        }
+      });
+      it('otázky se slepou mapou ukazují existující kraj', () => {
+        for (const q of quiz.questions) {
+          const region = q.kind === 'find' ? q.region : q.kind === 'write' ? q.map : undefined;
+          if (region !== undefined) expect(Object.keys(MAP_REGIONS), q.id).toContain(region);
         }
       });
       it('každý režim vytvoří otázky', () => {

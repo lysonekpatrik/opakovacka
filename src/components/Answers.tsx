@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { hintFor, judgeShort, judgeTranslation, normalize, tileWords, writeHint } from '../lib/check';
 import { shuffle } from '../lib/random';
-import type { Diagnosis, Item, Quiz, TranslateQuestion, WriteQuestion } from '../lib/types';
+import type { Diagnosis, FindQuestion, Item, Quiz, TranslateQuestion, WriteQuestion } from '../lib/types';
+import { judgeMapName } from '../lib/czmap';
+import { KRAJ_NAMES, type KrajId } from '../content/vlastiveda/kraje-data';
+import { CzMap, type MapTone } from './CzMap';
 
 export interface AnswerProps {
   item: Item;
@@ -216,6 +219,7 @@ export function ShortAnswer({ item, onAnswer }: AnswerProps) {
   const [hint, setHint] = useState(false);
   const [done, setDone] = useState(false);
   const [nudge, setNudge] = useState(false);
+  const [named, setNamed] = useState<KrajId | null>(null);
   const input = useRef<HTMLInputElement>(null);
   const many = !!q.pool && (q.need ?? q.pool.length) > 1;
 
@@ -233,11 +237,24 @@ export function ShortAnswer({ item, onAnswer }: AnswerProps) {
       return;
     }
     setDone(true);
+    if (q.map) {
+      const r = judgeMapName(value, q);
+      setNamed(r.named);
+      onAnswer(r.res, value.trim());
+      return;
+    }
     onAnswer(judgeShort(value, q), value.trim());
   };
 
+  const tones: Record<string, MapTone> = {};
+  if (q.map) {
+    tones[q.map] = done ? 'ok' : 'focus';
+    if (named) tones[named] = 'bad';
+  }
+
   return (
     <form className="write" noValidate autoComplete="off" onSubmit={submit}>
+      {q.map && <CzMap label="Slepá mapa České republiky, jeden kraj je vybarvený" tones={tones} />}
       <label className="sr" htmlFor="answer-input">
         Tvoje odpověď
       </label>
@@ -252,7 +269,7 @@ export function ShortAnswer({ item, onAnswer }: AnswerProps) {
         autoCapitalize="sentences"
         spellCheck={false}
         enterKeyHint="done"
-        placeholder={many ? 'Napiš je, odděl čárkou' : 'Napiš odpověď'}
+        placeholder={many ? 'Napiš je, odděl čárkou' : q.map ? 'Napiš celý název kraje' : 'Napiš odpověď'}
         value={value}
         readOnly={done}
         onChange={(e) => setValue(e.target.value)}
@@ -276,5 +293,40 @@ export function ShortAnswer({ item, onAnswer }: AnswerProps) {
         </div>
       )}
     </form>
+  );
+}
+
+/* ---------- slepá mapa: klikni na kraj ---------- */
+
+export function MapFind({ item, onAnswer }: AnswerProps) {
+  const q = item.q as FindQuestion;
+  const [picked, setPicked] = useState<KrajId | null>(null);
+  const [hint, setHint] = useState(false);
+
+  const pick = (id: KrajId) => {
+    if (picked) return;
+    setPicked(id);
+    const ok = id === q.region;
+    onAnswer(ok ? { ok } : { ok, tip: `Tohle je ${KRAJ_NAMES[id]}, je na mapě červeně. ${q.answers[0]} je zeleně.` }, null);
+  };
+
+  const tones: Record<string, MapTone> = {};
+  if (picked) {
+    tones[q.region] = 'ok';
+    if (picked !== q.region) tones[picked] = 'bad';
+  }
+
+  return (
+    <div className="mapfind">
+      <CzMap label="Slepá mapa České republiky, klikni na kraj" tones={tones} onPick={picked ? undefined : pick} />
+      {hint && q.hint && <p className="maphint">{q.hint}</p>}
+      {!picked && q.hint && !hint && (
+        <div className="row">
+          <button type="button" className="ghost" onClick={() => setHint(true)}>
+            Nápověda
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

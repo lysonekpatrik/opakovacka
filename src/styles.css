@@ -441,3 +441,28 @@ mark { background: linear-gradient(transparent 52%, var(--marker) 52%, var(--mar
 
 .leave { border-top: 1.5px dashed var(--line); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
 .leave p { margin: 0; }
+
+/* ---------- slepá mapa ČR ---------- */
+.czmap { display: block; width: 100%; height: auto; margin: 2px 0 4px; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.czmap .map-region {
+  fill: var(--paper); stroke: var(--label-frame); stroke-width: 1.2px; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke; transition: fill 0.15s;
+}
+.czmap .map-outline { fill: none; stroke: var(--ink); stroke-width: 2.4px; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; }
+.czmap .map-region.focus { fill: var(--marker); }
+.czmap .map-region.ok { fill: var(--ok); fill-opacity: 0.55; }
+.czmap .map-region.bad { fill: var(--bad); fill-opacity: 0.55; }
+.czmap.pick .map-region { cursor: pointer; }
+.czmap.pick .map-region:hover, .czmap.pick .map-region:focus-visible { fill: var(--marker-soft); }
+.czmap.pick .map-region:focus-visible { outline: none; stroke: var(--pen); stroke-width: 3px; }
+.czmap .map-hit { fill: transparent; cursor: pointer; }
+.czmap .map-state { font-family: var(--font-body); font-size: 26px; font-weight: 600; letter-spacing: 0.08em; fill: var(--muted); text-anchor: middle; opacity: 0.75; }
+.czmap .map-num circle { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.czmap .map-num text { font-family: var(--font-body); font-size: 28px; font-weight: 700; fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
+.mapfind { display: flex; flex-direction: column; gap: 10px; }
+.maphint { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--marker-soft); color: var(--ink); font-weight: 500; }
+.map-legend { margin: 8px 0 0; padding-left: 28px; columns: 2 220px; column-gap: 24px; }
+.map-legend li { padding: 3px 0; break-inside: avoid; }
+.map-credit { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.missed li.has-map { display: grid; grid-template-columns: 112px 1fr; column-gap: 12px; align-items: center; }
+.missed li.has-map .czmap.mini { grid-row: span 2; margin: 0; }

@@ -5,7 +5,8 @@ import { recordResult } from '../lib/progress';
 import { getMembership, leagueEnabled, pointsLabel, submitScore, type SubmitResult } from '../lib/league';
 import { gradeFor } from '../lib/grade';
 import type { Diagnosis, Item, Mode, Quiz } from '../lib/types';
-import { ChoiceAnswer, ShortAnswer, TilesAnswer, WriteAnswer } from '../components/Answers';
+import { ChoiceAnswer, MapFind, ShortAnswer, TilesAnswer, WriteAnswer } from '../components/Answers';
+import { CzMap } from '../components/CzMap';
 import { Feedback } from '../components/Feedback';
 import { SpeakButton } from '../components/SpeakButton';
 import { NotFoundQuiz } from '../components/NotFoundQuiz';
@@ -126,8 +127,10 @@ function Game({ quiz, mode }: { quiz: Quiz; mode: Mode }) {
             <ol className="missed">
               {missed.map((it, i) => {
                 const q = it.q;
+                const region = q.kind === 'find' ? q.region : q.kind === 'write' ? q.map : undefined;
                 return (
-                  <li key={i}>
+                  <li key={i} className={region ? 'has-map' : undefined}>
+                    {region && <CzMap className="mini" label="Kraj na mapě" tones={{ [region]: 'ok' }} bare />}
                     {q.kind === 'translate' && q.context && (
                       <span className="missed-q" lang="en">
                         {q.context}
@@ -162,7 +165,7 @@ function Game({ quiz, mode }: { quiz: Quiz; mode: Mode }) {
   const q = item.q;
   const promptLang = q.kind === 'choice' ? q.promptLang ?? 'cs' : 'cs';
   const AnswerView =
-    q.kind === 'write' ? ShortAnswer : item.format === 'choice' ? ChoiceAnswer : item.format === 'tiles' ? TilesAnswer : WriteAnswer;
+    q.kind === 'find' ? MapFind : q.kind === 'write' ? ShortAnswer : item.format === 'choice' ? ChoiceAnswer : item.format === 'tiles' ? TilesAnswer : WriteAnswer;
   const key = `${round.n}-${idx}`;
 
   return (
