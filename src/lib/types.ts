@@ -6,7 +6,8 @@ export type Format = 'choice' | 'tiles' | 'write';
 export type IconName =
   | 'pen' | 'list' | 'blocks' | 'keyboard' | 'speaker' | 'mix' | 'sheet'
   | 'drop' | 'wind' | 'sun' | 'soil' | 'rock' | 'share' | 'back' | 'plus' | 'trophy'
-  | 'be' | 've' | 'pe'
+  | 'be' | 've' | 'pe' | 'by' | 'ly'
+  | 'divide' | 'split' | 'hundreds'
   | 'castle' | 'fish' | 'mountain' | 'pin' | 'city' | 'grape' | 'factory' | 'clock';
 
 /** Otázka s výběrem z možností. První možnost je vždy správná, při hře se zamíchají. */

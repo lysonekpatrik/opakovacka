@@ -2,6 +2,8 @@ import type { Quiz, Subject, SubjectId } from '../lib/types';
 import { nezivaPriroda } from './prirodoveda/neziva-priroda';
 import { slovesoCan } from './anglictina/sloveso-can';
 import { beVePe } from './cestina/be-ve-pe';
+import { vyjmenovanaSlovaBL } from './cestina/vyjmenovana-slova-b-l';
+import { pametneDeleni } from './matematika/pametne-deleni';
 import { jihoceskyPlzenskyVysocina, krajeCr } from './vlastiveda/kraje';
 import { slepaMapa } from './vlastiveda/slepa-mapa';
 
@@ -9,7 +11,16 @@ import { slepaMapa } from './vlastiveda/slepa-mapa';
  * Seznam všech kvízů.
  * Nový kvíz = nový soubor ve složce předmětu + jeden řádek sem.
  */
-export const QUIZZES: Quiz[] = [nezivaPriroda, slovesoCan, beVePe, jihoceskyPlzenskyVysocina, krajeCr, slepaMapa];
+export const QUIZZES: Quiz[] = [
+  nezivaPriroda,
+  slovesoCan,
+  beVePe,
+  vyjmenovanaSlovaBL,
+  pametneDeleni,
+  jihoceskyPlzenskyVysocina,
+  krajeCr,
+  slepaMapa,
+];
 
 /** Předměty v pořadí, v jakém se zobrazí na úvodní obrazovce. */
 export const SUBJECTS: Subject[] = [

@@ -1,8 +1,8 @@
 import type { IconName } from '../lib/types';
 
 /** Ikona se slabikou (např. bě), pro kvízy z češtiny. */
-const syllable = (text: string) =>
-  `<text x="12" y="16.8" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" stroke="none">${text}</text>`;
+const syllable = (text: string, size = 13) =>
+  `<text x="12" y="${size >= 13 ? 16.8 : 15.8}" text-anchor="middle" font-size="${size}" font-weight="700" fill="currentColor" stroke="none">${text}</text>`;
 
 const PATHS: Record<IconName, string> = {
   pen: '<path d="M4 20l4.2-1 10.6-10.6a2.1 2.1 0 0 0-3-3L5.2 16 4 20z"/><path d="M14.5 6.5l3 3"/>',
@@ -24,6 +24,11 @@ const PATHS: Record<IconName, string> = {
   be: syllable('bě'),
   ve: syllable('vě'),
   pe: syllable('pě'),
+  by: syllable('by'),
+  ly: syllable('ly'),
+  divide: '<path d="M5 12h14"/><circle cx="12" cy="6.5" r="1.2" fill="currentColor"/><circle cx="12" cy="17.5" r="1.2" fill="currentColor"/>',
+  split: '<path d="M12 3.5v6"/><path d="M12 9.5l-5.5 6M12 9.5l5.5 6"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="18" r="2.4"/>',
+  hundreds: syllable('123', 10),
   castle: '<path d="M4 21V9h3v2h2V9h2v2h2V9h2v2h2V9h3v12z"/><path d="M10 21v-4a2 2 0 0 1 4 0v4"/><path d="M12 9V3l3 1.5-3 1.5"/>',
   fish: '<path d="M3 12c3-4.5 9-6 14-2 1 .8 2 1.4 4 2-2 .6-3 1.2-4 2-5 4-11 2.5-14-2z"/><path d="M3 12l-1-3M3 12l-1 3"/><path d="M8 11.5h.01"/>',
   mountain: '<path d="M2 20l7-12 4 6 2.5-3.5L22 20z"/><path d="M7.2 11l1.8 1.5 1.6-1.2"/>',
