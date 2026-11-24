@@ -4,7 +4,7 @@ import { slovesoCan } from './anglictina/sloveso-can';
 import { beVePe } from './cestina/be-ve-pe';
 import { vyjmenovanaSlovaBL } from './cestina/vyjmenovana-slova-b-l';
 import { pametneDeleni } from './matematika/pametne-deleni';
-import { jihoceskyPlzenskyVysocina, krajeCr } from './vlastiveda/kraje';
+import { jihoceskyPlzenskyVysocina, krajeCr, moravskeKraje } from './vlastiveda/kraje';
 import { slepaMapa } from './vlastiveda/slepa-mapa';
 
 /**
@@ -18,6 +18,7 @@ export const QUIZZES: Quiz[] = [
   vyjmenovanaSlovaBL,
   pametneDeleni,
   jihoceskyPlzenskyVysocina,
+  moravskeKraje,
   krajeCr,
   slepaMapa,
 ];

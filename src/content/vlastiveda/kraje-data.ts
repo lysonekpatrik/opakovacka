@@ -421,6 +421,7 @@ export const OLOMOUCKY: Kraj = {
     ['Která řeka pramení v Olomouckém kraji a teče do Baltského moře?', ['Odra', 'Morava', 'Labe', 'Vltava'], 'Odra pramení v Oderských vrších. Pak teče přes Ostravu do Polska a do Baltského moře.'],
     ['Se kterým státem sousedí Olomoucký kraj?', ['S Polskem', 'Se Slovenskem', 'S Rakouskem', 'S Německem'], 'Olomoucký kraj hraničí s Polskem na severu, v Jeseníkách.'],
     ['Jaká univerzita sídlí v Olomouci?', ['Univerzita Palackého, druhá nejstarší u nás', 'Karlova univerzita, nejstarší u nás', 'Masarykova univerzita', 'Žádná'], 'Univerzita Palackého je pojmenovaná po historikovi Františku Palackém. Masarykova univerzita je v Brně.'],
+    ['Která řeka teče kolem Hranické propasti a vlévá se do Moravy?', ['Bečva', 'Odra', 'Dyje', 'Svitava'], 'Bečva vzniká ve Valašském Meziříčí ze dvou řek, Rožnovské a Vsetínské Bečvy. Do Moravy se vlévá u Přerova.'],
   ],
   where: [
     ['Ve kterém kraji je Hranická propast?', 'Hranická propast je u města Hranice v Olomouckém kraji.'],
@@ -444,6 +445,7 @@ export const MORAVSKOSLEZSKY: Kraj = {
     ['Kolik metrů měří Praděd? Napiš číslo.', ['1491', '1491 m', '1491 metrů', '1 491'], 'Praděd je nejvyšší hora Moravy. Na vrcholu stojí vysoký vysílač s rozhlednou.', true],
     ['Do kterého moře se vlévá řeka Odra?', ['Baltské moře', 'Baltského moře', 'do Baltského moře', 'Baltské'], 'Odra je hlavní řeka kraje. Teče přes Ostravu do Polska a končí v Baltském moři.'],
     ['Se kterými státy sousedí Moravskoslezský kraj?', { pool: ['Polsko|Polskem', 'Slovensko|Slovenskem'], show: 'Polsko a Slovensko' }, 'Na severu je Polsko, na jihovýchodě Slovensko.'],
+    ['Podle které řeky dostala jméno Ostrava?', ['Ostravice'], 'Řeka se kdysi jmenovala stejně jako město, Ostrava. Dnes jí říkáme Ostravice. Pramení v Beskydech a v Ostravě se vlévá do Odry.'],
   ],
   choice: [
     ['Které město je krajským městem Moravskoslezského kraje?', ['Ostrava', 'Opava', 'Havířov', 'Frýdek-Místek'], 'Opava, Havířov i Frýdek-Místek jsou také v Moravskoslezském kraji. Opava bývala hlavním městem Slezska.'],
@@ -520,6 +522,8 @@ export const JIHOMORAVSKY: Kraj = {
     ['Co najdeš ve Znojmě?', ['Rotundu sv. Kateřiny', 'Baziliku sv. Prokopa', 'Pražský orloj', 'Chrám sv. Barbory'], 'Rotunda sv. Kateřiny je kulatý románský kostelík. Uvnitř jsou staré malby přemyslovských knížat.'],
     ['Která bitva se odehrála u Slavkova u Brna?', ['Bitva tří císařů', 'Bitva na Bílé hoře', 'Bitva u Lipan', 'Bitva na Moravském poli'], 'V roce 1805 tu francouzský císař Napoleon porazil ruského a rakouského císaře.'],
     ['Které řeky tečou Jihomoravským krajem?', ['Svratka, Svitava, Dyje a Morava', 'Vltava, Otava a Lužnice', 'Labe a Jizera', 'Ohře a Bílina'], 'Svratka se vlévá do Dyje a Dyje do Moravy. Morava pak teče do Dunaje a ten až do Černého moře.'],
+    ['Co je soutok?', ['Místo, kde se stékají dvě řeky', 'Místo, kde řeka pramení', 'Místo, kde se řeka vlévá do moře', 'Ostrov uprostřed řeky'], 'Za soutokem teče dál jen jedna řeka. V Brně se stéká Svratka se Svitavou a dál pokračuje Svratka.'],
+    ['Co dalšího najdeš v Brně?', ['Mezinárodní letiště', 'Uhelný důl Michal', 'Sloup Nejsvětější Trojice', 'Výrobnu ručního papíru'], 'Letiště je kousek za Brnem v Tuřanech. Důl Michal je v Ostravě, Sloup Nejsvětější Trojice v Olomouci a ruční papír se vyrábí ve Velkých Losinách.'],
   ],
   where: [
     ['Ve kterém kraji je propast Macocha?', 'Macocha je v Moravském krasu severně od Brna.'],

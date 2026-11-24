@@ -72,97 +72,137 @@ const items = (qs: Question[]): Item[] => qs.map((q) => ({ q, format: q.kind ===
 const pick = <T,>(qs: T[], n: number) => shuffle(qs).slice(0, n);
 const sectionOf = (q: Question) => (q.kind === 'translate' ? undefined : q.section);
 
-/* ---------- Písemka: Jihočeský, Plzeňský kraj a Kraj Vysočina ---------- */
+/* ---------- Písemka z několika krajů (jak se učí ve škole) ---------- */
 
-const TRIO = [JIHOCESKY, PLZENSKY, VYSOCINA];
+type IconName = NonNullable<Quiz['sections']>[number]['icon'];
 
-const trioSections: NonNullable<Quiz['sections']> = [
-  { id: 'jihocesky', name: 'Jihočeský kraj', icon: 'fish' },
-  { id: 'plzensky', name: 'Plzeňský kraj', icon: 'castle' },
-  { id: 'vysocina', name: 'Kraj Vysočina', icon: 'mountain' },
-  { id: 'kde', name: 'Ve kterém kraji to je?', icon: 'pin' },
-];
+interface PisemkaOpts {
+  id: string;
+  title: string;
+  description: string;
+  /** Kraje v pořadí, v jakém jsou v učebnici, a ikona jejich části. */
+  kraje: [Kraj, IconName][];
+  /** Kolik otázek z každého kraje dát do písemky nanečisto a kolik „Ve kterém kraji“. */
+  test: { choice: number; write: number; kde: number };
+  /** „tří“, „čtyř“: do popisu písemky. */
+  count: string;
+}
 
-const trioQuestions: Question[] = [
-  ...TRIO.flatMap((k) => krajQuestions(k, k.id)),
-  ...whereQuestions(
-    TRIO,
-    TRIO.map((k) => k.id),
-    'kde',
-  ),
-];
+/** Kvíz na písemku z několika krajů: každý kraj má svou část, k tomu „Ve kterém kraji to je?“. */
+function pisemkaQuiz({ id, title, description, kraje, test, count }: PisemkaOpts): Quiz {
+  const ks = kraje.map(([k]) => k);
+  const sections: NonNullable<Quiz['sections']> = [
+    ...kraje.map(([k, icon]) => ({ id: k.id, name: k.name, icon })),
+    { id: 'kde', name: 'Ve kterém kraji to je?', icon: 'pin' },
+  ];
+  const questions: Question[] = [
+    ...ks.flatMap((k) => krajQuestions(k, k.id)),
+    ...whereQuestions(
+      ks,
+      ks.map((k) => k.id),
+      'kde',
+    ),
+  ];
+  const inSection = (sid: string) => questions.filter((q) => sectionOf(q) === sid);
+  const written = questions.filter((q) => q.kind === 'write');
+  const school = questions.filter((q) => q.kind !== 'translate' && q.school);
+  const testSize = ks.length * (test.choice + test.write) + test.kde;
 
-const trioIn = (id: string) => trioQuestions.filter((q) => sectionOf(q) === id);
-const trioWritten = trioQuestions.filter((q) => q.kind === 'write');
-const trioSchool = trioQuestions.filter((q) => q.kind !== 'translate' && q.school);
+  /** Písemka nanečisto: z každého kraje pár otázek s možnostmi a na napsání, k tomu „Ve kterém kraji“. */
+  const buildTest = () =>
+    shuffle([
+      ...ks.flatMap((k) => {
+        const qs = inSection(k.id);
+        return [...pick(qs.filter((q) => q.kind === 'choice'), test.choice), ...pick(qs.filter((q) => q.kind === 'write'), test.write)];
+      }),
+      ...pick(inSection('kde'), test.kde),
+    ]);
 
-/** Písemka nanečisto: z každého kraje 3 otázky s možnostmi a 2 na napsání, k tomu 3× „Ve kterém kraji“. */
-const buildTrioTest = () =>
-  shuffle([
-    ...TRIO.flatMap((k) => {
-      const qs = trioIn(k.id);
-      return [...pick(qs.filter((q) => q.kind === 'choice'), 3), ...pick(qs.filter((q) => q.kind === 'write'), 2)];
-    }),
-    ...pick(trioIn('kde'), 3),
-  ]);
+  const modes: Mode[] = [
+    {
+      id: 'mix',
+      name: 'Mix ze všeho',
+      description: `${sections.length * 4} otázek, z každé části čtyři`,
+      icon: 'mix',
+      featured: true,
+      build: () => shuffle(sections.flatMap((s) => items(pick(inSection(s.id), 4)))),
+    },
+    {
+      id: 'pisemka',
+      name: 'Písemka nanečisto',
+      description: `${testSize} otázek ze všech ${count} krajů, i s psaním`,
+      icon: 'pen',
+      build: () => items(buildTest()),
+    },
+    {
+      id: 'napis',
+      name: 'Napiš správně',
+      description: `${written.length} odpovědí na napsání, hlídá i pravopis`,
+      icon: 'keyboard',
+      build: () => shuffle(items(written)),
+    },
+    {
+      id: 'ucebnice',
+      name: 'Otázky z učebnice',
+      description: `${school.length} otázek z rámečků Zjisti a Vyhledej`,
+      icon: 'sheet',
+      build: () => shuffle(items(school)),
+    },
+    ...sections.map((s) => ({
+      id: s.id,
+      name: s.name,
+      description: `${inSection(s.id).length} otázek`,
+      icon: s.icon,
+      build: () => shuffle(items(inSection(s.id))),
+    })),
+  ];
 
-const trioModes: Mode[] = [
-  {
-    id: 'mix',
-    name: 'Mix ze všeho',
-    description: `${trioSections.length * 4} otázek, z každé části čtyři`,
-    icon: 'mix',
-    featured: true,
-    build: () => shuffle(trioSections.flatMap((s) => items(pick(trioIn(s.id), 4)))),
-  },
-  {
-    id: 'pisemka',
-    name: 'Písemka nanečisto',
-    description: '18 otázek ze všech tří krajů, i s psaním',
-    icon: 'pen',
-    build: () => items(buildTrioTest()),
-  },
-  {
-    id: 'napis',
-    name: 'Napiš správně',
-    description: `${trioWritten.length} odpovědí na napsání, hlídá i pravopis`,
-    icon: 'keyboard',
-    build: () => shuffle(items(trioWritten)),
-  },
-  {
-    id: 'ucebnice',
-    name: 'Otázky z učebnice',
-    description: `${trioSchool.length} otázek z rámečků Zjisti a Vyhledej`,
-    icon: 'sheet',
-    build: () => shuffle(items(trioSchool)),
-  },
-  ...trioSections.map((s) => ({
-    id: s.id,
-    name: s.name,
-    description: `${trioIn(s.id).length} otázek`,
-    icon: s.icon,
-    build: () => shuffle(items(trioIn(s.id))),
-  })),
-];
+  return {
+    id,
+    subject: 'vlastiveda',
+    grade: 4,
+    title,
+    description,
+    sections,
+    questions,
+    modes,
+    cheatsheet: [
+      {
+        type: 'note',
+        title: 'Zapamatuj si',
+        text: 'U každého kraje umět: krajské město, se kterými státy sousedí, hlavní řeky a hory, čím je kraj známý a jeho nejslavnější památky. Názvy měst, řek a hor píšeme s velkým písmenem.',
+      },
+      ...ks.map((k) => ({ type: 'note' as const, title: k.name, text: k.memo })),
+    ],
+  };
+}
 
-export const jihoceskyPlzenskyVysocina: Quiz = {
+export const jihoceskyPlzenskyVysocina = pisemkaQuiz({
   id: 'jihocesky-plzensky-vysocina',
-  subject: 'vlastiveda',
-  grade: 4,
   title: 'Jihočeský, Plzeňský kraj a Vysočina',
   description: 'Na písemku: krajská města, řeky, sousední státy, památky a zajímavosti tří krajů.',
-  sections: trioSections,
-  questions: trioQuestions,
-  modes: trioModes,
-  cheatsheet: [
-    {
-      type: 'note',
-      title: 'Zapamatuj si',
-      text: 'U každého kraje umět: krajské město, se kterými státy sousedí, hlavní řeky a hory, čím je kraj známý a jeho nejslavnější památky. Názvy měst, řek a hor píšeme s velkým písmenem.',
-    },
-    ...TRIO.map((k) => ({ type: 'note' as const, title: k.name, text: k.memo })),
+  kraje: [
+    [JIHOCESKY, 'fish'],
+    [PLZENSKY, 'castle'],
+    [VYSOCINA, 'mountain'],
   ],
-};
+  test: { choice: 3, write: 2, kde: 3 },
+  count: 'tří',
+});
+
+export const moravskeKraje = pisemkaQuiz({
+  id: 'moravske-kraje',
+  title: 'Olomoucký, Moravskoslezský, Zlínský a Jihomoravský kraj',
+  description: 'Na písemku: krajská města, řeky, hory, sousední státy, památky a zajímavosti čtyř krajů na Moravě.',
+  kraje: [
+    [OLOMOUCKY, 'clock'],
+    [MORAVSKOSLEZSKY, 'factory'],
+    [ZLINSKY, 'city'],
+    [JIHOMORAVSKY, 'grape'],
+  ],
+  test: { choice: 2, write: 2, kde: 4 },
+  count: 'čtyř',
+});
 
 /* ---------- Kraje ČR: všech 14 krajů na čtvrtletní práci ---------- */
 
